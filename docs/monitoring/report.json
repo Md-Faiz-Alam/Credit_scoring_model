@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-11-25T01:57:45+00:00",
+  "log_file": "simulated_downturn.jsonl",
+  "rows": 4992,
+  "window_start": "2026-11-25T01:56:51+00:00",
+  "window_end": "2026-11-25T01:56:54+00:00",
+  "model_version_reference": "2026.11.24-150b4624",
+  "model_versions_seen": [
+    "2026.11.24-150b4624"
+  ],
+  "status": "action",
+  "score": {
+    "name": "score",
+    "psi": 0.07724,
+    "status": "stable",
+    "missing_rate_ref": 0.0,
+    "missing_rate_now": 0.0,
+    "mean_ref": 661.15854,
+    "mean_now": 637.071114
+  },
+  "approval_rate_ref": 0.895585,
+  "approval_rate_now": 0.835337,
+  "approval_status": "action",
+  "mean_pd_ref": 0.066927,
+  "mean_pd_now": 0.094194,
+  "mean_pd_status": "action",
+  "features": [
+    {
+      "name": "debt_ratio",
+      "psi": 0.08911,
+      "status": "stable",
+      "missing_rate_ref": 0.0,
+      "missing_rate_now": 0.0,
+      "mean_ref": 352.959859,
+      "mean_now": 374.841971
+    },
+    {
+      "name": "past_due_30_59",
+      "psi": 0.07557,
+      "status": "stable",
+      "missing_rate_ref": 0.001501,
+      "missing_rate_now": 0.001202,
+      "mean_ref": 0.245805,
+      "mean_now": 0.383674
+    },
+    {
+      "name": "monthly_income",
+      "psi": 0.06618,
+      "status": "stable",
+      "missing_rate_ref": 0.196102,
+      "missing_rate_now": 0.191106,
+      "mean_ref": 6636.76095,
+      "mean_now": 5995.656872
+    },
+    {
+      "name": "revolving_utilization",
+      "psi": 0.05138,
+      "status": "stable",
+      "missing_rate_ref": 0.0,
+      "missing_rate_now": 0.0,
+      "mean_ref": 6.571714,
+      "mean_now": 0.398
+    },
+    {
+      "name": "age",
+      "psi": 0.00129,
+      "status": "stable",
+      "missing_rate_ref": 1e-05,
+      "missing_rate_now": 0.0,
+      "mean_ref": 52.327076,
+      "mean_now": 52.434696
+    },
+    {
+      "name": "open_credit_lines",
+      "psi": 0.00119,
+      "status": "stable",
+      "missing_rate_ref": 0.0,
+      "missing_rate_now": 0.0,
+      "mean_ref": 8.487506,
+      "mean_now": 8.552684
+    },
+    {
+      "name": "real_estate_loans",
+      "psi": 0.00033,
+      "status": "stable",
+      "missing_rate_ref": 0.0,
+      "missing_rate_now": 0.0,
+      "mean_ref": 1.020961,
+      "mean_now": 1.043269
+    },
+    {
+      "name": "past_due_90_plus",
+      "psi": 7e-05,
+      "status": "stable",
+      "missing_rate_ref": 0.001501,
+      "missing_rate_now": 0.001202,
+      "mean_ref": 0.091758,
+      "mean_now": 0.092659
+    },
+    {
+      "name": "past_due_60_89",
+      "psi": 7e-05,
+      "status": "stable",
+      "missing_rate_ref": 0.001501,
+      "missing_rate_now": 0.001202,
+      "mean_ref": 0.06454,
+      "mean_now": 0.062174
+    },
+    {
+      "name": "dependents",
+      "psi": 5e-05,
+      "status": "stable",
+      "missing_rate_ref": 0.025714,
+      "missing_rate_now": 0.026242,
+      "mean_ref": 0.759305,
+      "mean_now": 0.760543
+    },
+    {
+      "name": "delinquency_code_reported",
+      "psi": 0.0,
+      "status": "stable",
+      "missing_rate_ref": 0.0,
+      "missing_rate_now": 0.0,
+      "mean_ref": 0.001501,
+      "mean_now": 0.001202
+    }
+  ],
+  "alerts": [
+    "Mean PD 6.69% -> 9.42% (+41%, action): portfolio risk has moved",
+    "Approval rate 89.6% -> 83.5% (action)"
+  ]
+}

@@ -1,0 +1,141 @@
+[project]
+name = "credit-scoring"
+version = "0.1.0"
+description = "Production-style credit risk scoring: calibrated PD model, 300-850 scorecard, explainable API and monitoring."
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+license = { text = "MIT" }
+authors = [{ name = "Md Faiz Alam" }]
+
+# Core: everything needed to load the model and score an applicant.
+dependencies = [
+    "numpy>=2.2",
+    "pandas>=2.2",
+    "scikit-learn>=1.6",
+    "lightgbm>=4.5",
+    "pandera>=0.22",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "pyyaml>=6.0",
+    "joblib>=1.4",
+    "shap>=0.47",
+    "pyarrow>=18.0",
+]
+
+[project.optional-dependencies]
+# Dataset download from Kaggle
+data = [
+    "kaggle>=1.7",
+]
+# Training / experimentation (not needed in the serving image)
+train = [
+    "optuna>=4.1",
+    "mlflow>=2.19",
+    "matplotlib>=3.9",
+]
+# REST API
+api = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+]
+
+[dependency-groups]
+# Web UI. A dependency *group*, not an extra, so the UI image can install it without
+# the model stack (the UI only talks HTTP to the API): uv sync --only-group ui
+ui = [
+    "streamlit>=1.40",
+    "plotly>=5.24",
+    "httpx>=0.28",
+]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "httpx>=0.28",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pandas-stubs>=2.2",
+    "types-pyyaml>=6.0",
+    "pre-commit>=4.0",
+    "poethepoet>=0.31",
+]
+# Exploratory notebook only
+notebook = [
+    "ipykernel>=6.29",
+    "seaborn>=0.13",
+    "matplotlib>=3.9",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/credit_scoring"]
+
+[tool.uv]
+default-groups = ["dev", "notebook", "ui"]
+
+# ---------------------------------------------------------------- tasks
+# Run with:  uv run poe <task>     (works the same on Windows, macOS, Linux)
+[tool.poe.tasks]
+download  = { cmd = "python -m credit_scoring.data.download", help = "Fetch dataset from Kaggle" }
+data      = { cmd = "python -m credit_scoring.data.make_dataset", help = "Validate, clean, split" }
+features  = { cmd = "python -m credit_scoring.features.report", help = "IV / WoE report" }
+train     = { cmd = "python -m credit_scoring.models.train", help = "Train, compare, package model" }
+evaluate  = { cmd = "python -m credit_scoring.evaluation.report", help = "Model card + charts" }
+simulate  = { cmd = "python -m credit_scoring.monitoring.simulate", help = "Simulate scored traffic (--scenario)" }
+monitor   = { cmd = "python -m credit_scoring.monitoring.monitor", help = "Drift report: prediction log vs training" }
+mlflow-ui = { cmd = "mlflow ui --backend-store-uri sqlite:///mlflow.db", help = "Browse experiment runs" }
+lint      = { cmd = "ruff check src tests app", help = "Lint" }
+format    = { cmd = "ruff format src tests app", help = "Auto-format" }
+format-check = { cmd = "ruff format --check src tests app", help = "Fail if not formatted" }
+typecheck = { cmd = "mypy src", help = "Static type check" }
+cov       = { cmd = "pytest --cov --cov-report=term-missing:skip-covered --cov-report=xml", help = "Tests + coverage gate" }
+test      = { cmd = "pytest", help = "Run tests" }
+check     = { sequence = ["lint", "format-check", "typecheck", "cov"], help = "Everything CI runs" }
+api       = { cmd = "uvicorn credit_scoring.api.main:app --reload --port 8000", help = "Run scoring API (http://localhost:8000/docs)" }
+ui        = { cmd = "streamlit run app/streamlit_app.py", help = "Run web UI (needs the API)" }
+
+# ---------------------------------------------------------------- tools
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "PD", "NPY", "RUF"]
+ignore = ["N803", "N806"]  # allow scikit-learn's `X` convention for feature matrices
+
+[tool.ruff.lint.per-file-ignores]
+# Markdown template: wrapping lines would change the rendered document
+"src/credit_scoring/evaluation/report.py" = ["E501"]
+"src/credit_scoring/monitoring/monitor.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+mypy_path = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = [
+    # raised inside MLflow's own SQLAlchemy store, not our code
+    "ignore::DeprecationWarning:mlflow.*",
+    "ignore:.*noload.*:DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["credit_scoring"]
+omit = [
+    # thin CLI wrappers around tested functions; exercised manually / in the pipeline
+    "*/data/download.py",
+    "*/features/report.py",
+]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+exclude_also = ["if __name__ == .__main__.:"]

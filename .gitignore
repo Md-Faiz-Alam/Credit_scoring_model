@@ -1,0 +1,40 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data, trained models and experiment output are produced by the pipeline,
+# never committed. Folder placeholders are kept.
+data/*
+!data/.gitkeep
+models/*
+!models/.gitkeep
+reports/*
+!reports/.gitkeep
+mlruns/
+mlartifacts/
+mlflow.db
+logs/
+*.pkl
+*.joblib
+
+# Environment / secrets
+.env
+
+# IDE / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+coverage.xml
+.coverage

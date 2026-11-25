@@ -1,0 +1,64 @@
+# Training configuration. Every modelling choice lives here, not in code.
+# Load / validate: credit_scoring.models.config.TrainConfig
+
+features:
+  cap_quantile: 0.99        # upper cap for heavy-tailed columns (fit on train)
+  woe_max_bins: 6
+  woe_min_bin_frac: 0.03
+
+scorecard:                  # champion candidate: WoE logistic regression
+  min_iv: 0.02              # drop features with less information than this
+  max_correlation: 0.7      # of a correlated WoE pair, keep the higher-IV one
+  C: 1.0                    # inverse regularisation strength
+
+lightgbm:                   # challenger: gradient boosting
+  n_trials: 30              # Optuna trials (5-fold CV on train each)
+  cv_folds: 5
+  learning_rate: 0.05
+  early_stopping_rounds: 100
+  monotone: true            # risk may only move one way in these features
+  monotone_constraints:     # +1 = higher value -> higher risk
+    revolving_utilization: 1
+    age: -1
+    past_due_30_59: 1
+    past_due_60_89: 1
+    past_due_90_plus: 1
+    total_past_due: 1
+    debt_ratio: 1
+    monthly_income: -1
+
+selection:
+  # The interpretable scorecard stays champion unless boosting is clearly better.
+  min_auc_gain_for_challenger: 0.005
+
+calibration:
+  # Models trained on the natural class balance are usually calibrated already.
+  # Recalibrate (Platt) on the validation split only if ECE exceeds this tolerance.
+  max_ece: 0.01
+
+score:                      # PD -> credit score (points to double the odds)
+  base_score: 650           # score at the base odds
+  base_odds: 30             # good:bad odds of 30:1 (PD ~3.2%) scores 650
+  pdo: 40                   # +40 points = odds of being good double
+  min_score: 300
+  max_score: 850
+
+risk_grades:                # upper PD bound of each grade (last grade takes the rest)
+  A: 0.02
+  B: 0.05
+  C: 0.10
+  D: 0.20
+  E: 1.00
+
+decision:
+  # Relative cost of a wrong decision, per loan:
+  #   approving a borrower who defaults loses ~ LGD x exposure (e.g. 60% of the loan)
+  #   declining a borrower who would have repaid loses the margin (e.g. 12% of the loan)
+  cost_false_negative: 5.0  # approve -> default
+  cost_false_positive: 1.0  # decline -> would have repaid
+
+quality_gate:               # training fails if the model is worse than this
+  min_valid_auc: 0.84
+  max_valid_ece: 0.02
+
+random_state: 42

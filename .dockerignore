@@ -1,0 +1,10 @@
+# Build context = what the Dockerfiles COPY, nothing more.
+# Models are mounted at runtime, data never enters an image.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!src/
+!app/
+src/**/__pycache__
+app/**/__pycache__
