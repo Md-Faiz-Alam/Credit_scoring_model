@@ -11,6 +11,17 @@ against a gradient-boosting challenger, calibrated probabilities, a cost-based
 approve/decline rule, per-applicant **reason codes**, an **age-fairness analysis**, a REST
 API with a web UI, **drift monitoring**, Docker, and CI.
 
+## Live demo
+
+| | |
+|---|---|
+| **Web app** | https://credit-scoring-ui-yjbu.onrender.com |
+| **Try a declined applicant** | https://credit-scoring-ui-yjbu.onrender.com/?profile=high-risk |
+| **API docs (try `/predict`)** | https://credit-scoring-api-e9e3.onrender.com/docs |
+
+> Hosted on a free tier: services sleep after ~15 minutes of inactivity, so the first visit
+> can take about a minute to wake up.
+
 ![Web UI: a declined application with its reason codes](docs/images/ui_score.png)
 
 ## Results (held-out test set, 22,409 applicants)
