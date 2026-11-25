@@ -145,7 +145,7 @@ If those ports are taken, set `API_PORT` / `UI_PORT`. Try a deep link: `http://l
   additivity, the quality gate rejecting a useless model, API contracts, and the Streamlit
   app driven headlessly.
 * **CI (GitHub Actions):** ruff lint and format, strict mypy, tests with the coverage gate, then
-  both Docker images are built and smoke-tested. Dependabot opens weekly update PRs.
+  both Docker images are built and smoke-tested.
 * **Reproducibility:** `uv.lock` pins every dependency. `configs/train.yaml` holds every
   modelling choice, validated by pydantic. Each model records the input data's SHA-256 and
   the git commit it was trained from.
