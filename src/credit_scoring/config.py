@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     # JSON-lines log of every scored application (inputs for drift monitoring).
     # Set CREDIT_PREDICTION_LOG="" to disable.
     prediction_log: Path | None = PROJECT_ROOT / "logs" / "predictions.jsonl"
+    # Remote model artefacts (e.g. a GitHub Release download folder). Used only when no
+    # model is present locally. A remote model is never loaded without its SHA-256.
+    model_url: str | None = None
+    model_sha256: str | None = None
 
     @field_validator("prediction_log", mode="before")
     @classmethod

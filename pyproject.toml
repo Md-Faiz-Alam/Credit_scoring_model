@@ -57,6 +57,7 @@ dev = [
     "types-pyyaml>=6.0",
     "pre-commit>=4.0",
     "poethepoet>=0.31",
+    "httpx2>=2.16",
 ]
 # Exploratory notebook only
 notebook = [

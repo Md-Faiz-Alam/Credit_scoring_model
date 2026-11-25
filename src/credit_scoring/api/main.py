@@ -29,18 +29,33 @@ from credit_scoring.api.schemas import (
 from credit_scoring.api.service import PredictionLog, ScoringService
 from credit_scoring.config import get_settings
 from credit_scoring.models.bundle import CreditRiskModel
+from credit_scoring.models.fetch import ensure_model
 
 log = logging.getLogger("credit_scoring.api")
+
+
+def _configure_logging() -> None:
+    """Uvicorn configures only its own loggers, so without this the app's INFO logs
+    (request lines, model download/verification) would be silently dropped."""
+    app_logger = logging.getLogger("credit_scoring")
+    if not app_logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+        app_logger.addHandler(handler)
+        app_logger.setLevel(logging.INFO)
+        app_logger.propagate = False
 
 
 def create_app(service: ScoringService | None = None) -> FastAPI:
     """App factory. Tests inject a ready ``service``. Otherwise the model is loaded from
     ``CREDIT_MODELS_DIR`` at startup, and startup fails loudly if it's missing."""
+    _configure_logging()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if service is None:
             settings = get_settings()
+            ensure_model(settings)  # download + verify a released model if none is local
             model = CreditRiskModel.load(settings.models_dir)
             app.state.service = ScoringService(model, PredictionLog(settings.prediction_log))
             _ = app.state.service.model.explainer  # build SHAP explainer before traffic

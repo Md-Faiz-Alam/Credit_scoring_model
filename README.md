@@ -100,7 +100,7 @@ curl -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{
     {"code": "R05", "message": "Age of applicant (proxy for length of credit history)", "impact": 0.2614},
     {"code": "R04", "message": "Income is low, not reported, or low relative to household size", "impact": 0.0828}
   ],
-  "model_version": "2026.11.24-150b4624"
+  "model_version": "2026.11.25-c25329fd"
 }
 ```
 Also available: `POST /predict/batch` (up to 1,000), `GET /model-info` and `GET /health`.
@@ -138,9 +138,19 @@ docker compose up --build        # UI http://localhost:8501 · API http://localh
 ```
 If those ports are taken, set `API_PORT` / `UI_PORT`. Try a deep link: `http://localhost:8501/?profile=high-risk`.
 
+**Cloud (Render, free plan):** two Docker web services built from this repository.
+* **API:** `docker/api.Dockerfile`, health check `/health`. Set `WEB_CONCURRENCY=1`,
+  `CREDIT_MODEL_URL` and `CREDIT_MODEL_SHA256`.
+* **UI:** `docker/ui.Dockerfile`, health check `/_stcore/health`. Set `CREDIT_API_URL` and
+  `CREDIT_API_TIMEOUT=120`.
+
+The model is published as a GitHub Release asset. At startup the API downloads it and refuses to
+load it unless its SHA-256 matches `CREDIT_MODEL_SHA256`, because unpickling an unverified file
+would run arbitrary code.
+
 ## Engineering
 
-* **Tests:** 128 tests on synthetic data with planted problems, 96% coverage, 90% gate in CI.
+* **Tests:** 135 tests on synthetic data with planted problems, 96% coverage, 90% gate in CI.
   They cover leakage (cleaning and features are row-independent), WoE monotonicity, SHAP
   additivity, the quality gate rejecting a useless model, API contracts, and the Streamlit
   app driven headlessly.
@@ -169,7 +179,7 @@ app/streamlit_app.py        web UI
 notebooks/01_eda.ipynb      exploratory analysis
 docker/, docker-compose.yml containers
 docs/                       model card, monitoring report, figures
-tests/                      128 tests
+tests/                      135 tests
 ```
 
 ## Limitations

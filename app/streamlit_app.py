@@ -15,7 +15,11 @@ import streamlit as st
 
 from credit_scoring.ui.client import ApiClient, ApiError
 
+# The API address comes only from configuration, never from page input: the Streamlit
+# server makes the request, so a user-editable URL would let visitors aim it anywhere (SSRF).
 API_URL = os.environ.get("CREDIT_API_URL", "http://localhost:8000")
+# Free hosting tiers put idle services to sleep; waking the API can take over a minute.
+API_TIMEOUT = float(os.environ.get("CREDIT_API_TIMEOUT", "30"))
 
 # Palette (validated): blue series, status colours only with icon + label.
 # Neutrals are translucent grey so they read on both Streamlit light and dark themes;
@@ -55,7 +59,7 @@ st.set_page_config(page_title="Credit Scoring", page_icon="📊", layout="wide")
 
 @st.cache_resource
 def get_client(url: str) -> ApiClient:
-    return ApiClient(url)
+    return ApiClient(url, timeout=API_TIMEOUT)
 
 
 @st.cache_data(ttl=60)
@@ -67,15 +71,21 @@ def get_model_info(url: str) -> dict[str, Any]:
 
 with st.sidebar:
     st.header("Scoring API")
-    api_url = st.text_input("API URL", API_URL)
+    api_url = API_URL
     client = get_client(api_url)
     try:
-        health = client.health()
-        info = get_model_info(api_url)
+        with st.spinner("Connecting to the scoring API (may take a minute after idle)…"):
+            health = client.health()
+            info = get_model_info(api_url)
         st.success(f"Connected, model `{health['model_version']}`", icon="✅")
     except ApiError as err:
         st.error(str(err), icon="⚠️")
-        st.info("Start the API with `uv run poe api`, then reload this page.")
+        st.info(
+            "If the service has been idle it may still be waking up. Try again in a "
+            "minute. Running locally? Start the API with `uv run poe api`."
+        )
+        if st.button("Retry"):
+            st.rerun()
         st.stop()
     st.caption(
         f"Champion: **{info['champion']}**  \n"

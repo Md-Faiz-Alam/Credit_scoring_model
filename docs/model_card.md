@@ -4,9 +4,9 @@
 
 | | |
 |---|---|
-| Model version | `2026.11.24-150b4624` |
+| Model version | `2026.11.25-c25329fd` |
 | Champion | **lightgbm** (challenger: WoE logistic scorecard) |
-| Trained | 2026-11-24T18:03:28+00:00 (git `bdfe815`) |
+| Trained | 2026-11-25T03:21:53+00:00 (git `860f80e`) |
 | Training data | `cs-training.csv`, sha256 `01a89f8446f3504c...` |
 | Split (stratified) | train 104,573 / valid 22,409 / test 22,409 |
 

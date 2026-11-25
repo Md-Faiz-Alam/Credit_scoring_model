@@ -4,10 +4,10 @@
 
 | | |
 |---|---|
-| Generated | 2026-11-25T01:57:45+00:00 |
+| Generated | 2026-11-25T03:22:15+00:00 |
 | Prediction log | `simulated_downturn.jsonl` (4,992 scored applications) |
-| Window | 2026-11-25T01:56:51+00:00 to 2026-11-25T01:56:54+00:00 |
-| Reference | training population, model `2026.11.24-150b4624` |
+| Window | 2026-11-25T03:22:08+00:00 to 2026-11-25T03:22:11+00:00 |
+| Reference | training population, model `2026.11.25-c25329fd` |
 | Approval rate | 89.6% (training) -> **83.5%** (current) 🔴 ACTION |
 | Mean PD | 6.69% (training) -> **9.42%** (current) 🔴 ACTION |
 
